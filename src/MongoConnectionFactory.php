@@ -1,4 +1,9 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause
+ * @copyright Copyright (c) 2014 Matthew Weier O'Phinney
+ */
+
 namespace PhlyMongo;
 
 use Mongo;
@@ -20,9 +25,9 @@ class MongoConnectionFactory implements FactoryInterface
      *
      * @var array
      */
-    protected $options = array(
+    protected $options = [
         'connect' => true
-    );
+    ];
 
     public function __construct($server = null, array $options = null)
     {

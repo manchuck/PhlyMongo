@@ -1,4 +1,8 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause
+ * @copyright Copyright (c) 2014 Matthew Weier O'Phinney
+ */
 
 namespace PhlyMongoTest;
 
@@ -29,7 +33,7 @@ class PaginatorAdapterTest extends AbstractTestCase
     {
         $items    = $this->adapter->getItems(5, 5);
         $expected = array_slice($this->items, 5, 5);
-        $test     = array();
+        $test     = [];
         foreach ($items as $item) {
             $test[] = $item;
         }

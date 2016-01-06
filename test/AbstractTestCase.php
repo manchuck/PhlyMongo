@@ -1,15 +1,42 @@
 <?php
+/**
+ * @license   http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause
+ * @copyright Copyright (c) 2014 Matthew Weier O'Phinney
+ */
 
 namespace PhlyMongoTest;
 
 use MongoCollection;
 use MongoDB;
-use PhlyMongo\HydratingMongoCursor;
 use PHPUnit_Framework_TestCase as TestCase;
-use Zend\Stdlib\Hydrator\ObjectProperty;
 
 abstract class AbstractTestCase extends TestCase
 {
+    /**
+     * @var \MongoClient|\Mongo
+     */
+    protected $mongo;
+
+    /**
+     * @var \MongoDB
+     */
+    protected $db;
+
+    /**
+     * @var \MongoCollection
+     */
+    protected $collection;
+
+    /**
+     * @var array
+     */
+    protected $items;
+
+    /**
+     * @var array
+     */
+    protected $authors;
+
     public function setUp()
     {
         if (!extension_loaded('mongo')) {
@@ -38,21 +65,21 @@ abstract class AbstractTestCase extends TestCase
     protected function seedCollection()
     {
         $this->collection->drop();
-        $this->authors = $authors = array(
+        $this->authors = $authors = [
             'Matthew',
             'Mark',
             'Luke',
             'John',
-        );
-        $this->items = array();
+        ];
+        $this->items = [];
         for ($i = 0; $i < 100; $i += 1) {
             $authorIndex = array_rand($authors);
             $title       = uniqid();
-            $data = array(
+            $data = [
                 'title'   => $title,
                 'author'  => $authors[$authorIndex],
                 'content' => str_repeat($title, $i + 1),
-            );
+            ];
             $this->collection->insert($data);
             $this->items[] = $data;
         }
