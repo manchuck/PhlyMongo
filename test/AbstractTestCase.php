@@ -6,8 +6,8 @@
 
 namespace PhlyMongoTest;
 
-use MongoCollection;
-use MongoDB;
+use MongoDB\Collection;
+use MongoDB\Driver\Manager;
 use PHPUnit_Framework_TestCase as TestCase;
 
 abstract class AbstractTestCase extends TestCase
@@ -39,24 +39,17 @@ abstract class AbstractTestCase extends TestCase
 
     public function setUp()
     {
-        if (!extension_loaded('mongo')) {
-            $this->markTestSkipped('Mongo extension is required to run tests');
+        if (!extension_loaded('mongodb')) {
+            $this->markTestSkipped('Mongodb extension is required to run tests');
         }
 
-        $mongoCxnClass = 'Mongo';
-        if (class_exists('MongoClient')) {
-            $mongoCxnClass = 'MongoClient';
-        }
-
-        $services   = Bootstrap::getServiceManager();
-        $config     = $services->get('ApplicationConfig');
-        $config     = $config['mongo'];
-        $mongo      = new $mongoCxnClass($config['server'], $config['server_options']);
-        $db         = new MongoDB($mongo, $config['db']);
-        $collection = new MongoCollection($db, $config['collection']);
+        $services     = Bootstrap::getServiceManager();
+        $config       = $services->get('ApplicationConfig');
+        $config       = $config['mongo'];
+        $mongo        = new Manager($config['server']);
+        $collection   = new Collection($mongo, $config['collection']);
 
         $this->mongo      = $mongo;
-        $this->db         = $db;
         $this->collection = $collection;
 
         $this->seedCollection();
@@ -80,7 +73,7 @@ abstract class AbstractTestCase extends TestCase
                 'author'  => $authors[$authorIndex],
                 'content' => str_repeat($title, $i + 1),
             ];
-            $this->collection->insert($data);
+            $this->collection->insertOne($data);
             $this->items[] = $data;
         }
     }

@@ -6,12 +6,11 @@
 
 namespace PhlyMongo;
 
-use Mongo;
-use MongoClient;
+use MongoDB\Client;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class MongoConnectionFactory implements FactoryInterface
+class MongoClientFactory implements FactoryInterface
 {
     /**
      * Server connection string
@@ -29,23 +28,30 @@ class MongoConnectionFactory implements FactoryInterface
         'connect' => true
     ];
 
-    public function __construct($server = null, array $options = null)
+    /**
+     * Driver-specific options
+     *
+     * @var array
+     */
+    protected $driverOptions = [];
+
+    public function __construct($server = null, array $options = null, array $driverOptions = null)
     {
         if (null !== $server) {
             $this->server = $server;
         }
+
         if (null !== $options) {
             $this->options = $options;
+        }
+
+        if (null !== $driverOptions) {
+            $this->driverOptions = $driverOptions;
         }
     }
 
     public function createService(ServiceLocatorInterface $services)
     {
-        // Use MongoClient if available (ext/mongo >= 1.4)
-        if (class_exists('MongoClient')) {
-            return new MongoClient($this->server, $this->options);
-        }
-
-        return new Mongo($this->server, $this->options);
+        return new Client($this->server, $this->options, $this->driverOptions);
     }
 }

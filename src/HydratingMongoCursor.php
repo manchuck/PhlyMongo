@@ -6,79 +6,87 @@
 
 namespace PhlyMongo;
 
-use Countable;
+use IteratorIterator;
 use InvalidArgumentException;
-use Iterator;
-use MongoCursor;
-use Zend\Stdlib\Hydrator\HydratorInterface;
+use MongoDB\Driver\Cursor as MongoCursor;
+use Zend\Hydrator\HydratorInterface;
+use Zend\Hydrator\Iterator\HydratingIteratorInterface;
 
-class HydratingMongoCursor implements Countable, Iterator
+class HydratingMongoCursor extends IteratorIterator implements HydratingIteratorInterface
 {
-    protected $cursor;
+    /**
+     * @var HydratorInterface
+     */
     protected $hydrator;
+
+    /**
+     * @var mixed
+     */
     protected $prototype;
 
+    /**
+     * HydratingMongoCursor constructor.
+     *
+     * @param MongoCursor $cursor
+     * @param HydratorInterface $hydrator
+     * @param $prototype
+     */
     public function __construct(MongoCursor $cursor, HydratorInterface $hydrator, $prototype)
     {
-        $this->cursor   = $cursor;
-        $this->hydrator = $hydrator;
+        parent::__construct($cursor);
+        $this->setHydrator($hydrator);
+        $this->setPrototype($prototype);
+    }
 
+    /**
+     * @param HydratorInterface $hydrator
+     */
+    public function setHydrator(HydratorInterface $hydrator)
+    {
+        $this->hydrator = $hydrator;
+    }
+
+    /**
+     * @return HydratorInterface
+     */
+    public function getHydrator()
+    {
+        return $this->hydrator;
+    }
+
+    /**
+     * @param object|string $prototype
+     */
+    public function setPrototype($prototype)
+    {
         if (!is_object($prototype)) {
             throw new InvalidArgumentException(sprintf(
                 'Prototype must be an object; received "%s"',
                 gettype($prototype)
             ));
         }
+
         $this->prototype = $prototype;
     }
 
-    public function getCursor()
-    {
-        return $this->cursor;
-    }
-
-    public function getHydrator()
-    {
-        return $this->hydrator;
-    }
-
+    /**
+     * @return mixed
+     */
     public function getPrototype()
     {
         return $this->prototype;
     }
 
-    public function count()
-    {
-        return $this->cursor->count();
-    }
-
+    /**
+     * @return mixed|object
+     */
     public function current()
     {
-        $result = $this->cursor->current();
+        $result = parent::current();
         if (!is_array($result)) {
             return $result;
         }
 
         return $this->hydrator->hydrate($result, clone $this->prototype);
-    }
-
-    public function key()
-    {
-        return $this->cursor->key();
-    }
-
-    public function next()
-    {
-        return $this->cursor->next();
-    }
-
-    public function rewind()
-    {
-        return $this->cursor->rewind();
-    }
-
-    public function valid()
-    {
-        return $this->cursor->valid();
     }
 }

@@ -25,7 +25,8 @@
     },
     "require": {
         "php": ">=5.5",
-        "ext-mongo": "*",
+        "ext-mongodb": ">=1.1",
+        "mongodb/mongodb": "^1.0.0@beta",
         "zendframework/zend-i18n": "~2.0",
         "zendframework/zend-paginator": "~2.0",
         "zendframework/zend-servicemanager": "~2.0",
